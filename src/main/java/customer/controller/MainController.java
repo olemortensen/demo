@@ -1,8 +1,14 @@
-package customer;
+package customer.controller;
 
+import customer.domain.Child;
+import customer.domain.User;
+import customer.dto.ChildDto;
+import customer.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import customer.repo.ChildRepository;
+import customer.repo.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +24,8 @@ public class MainController {
     private ChildRepository childRepository;
 
     @PostMapping(path = "/user")
-    public @ResponseBody UserDto createUser(@RequestBody UserDto userDto) {
+    public @ResponseBody
+    UserDto createUser(@RequestBody UserDto userDto) {
         User repoUser = new User();
         repoUser.setName(userDto.getName());
         repoUser.setEmail(userDto.getEmail());

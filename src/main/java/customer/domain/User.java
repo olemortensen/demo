@@ -1,4 +1,4 @@
-package customer;
+package customer.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

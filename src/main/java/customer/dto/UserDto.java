@@ -1,5 +1,6 @@
-package customer;
+package customer.dto;
 
+import customer.dto.ChildDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

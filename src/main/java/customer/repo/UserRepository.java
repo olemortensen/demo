@@ -1,8 +1,10 @@
-package customer;
+package customer.repo;
 
+import customer.domain.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChildRepository  extends CrudRepository<Child, Long> {
+public interface UserRepository extends CrudRepository<User, Long> {
+
 }

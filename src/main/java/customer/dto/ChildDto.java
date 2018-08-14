@@ -1,4 +1,4 @@
-package customer;
+package customer.dto;
 
 import lombok.Data;
 
