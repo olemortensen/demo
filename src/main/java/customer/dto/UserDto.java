@@ -3,12 +3,12 @@ package customer.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(exclude = "children")
 public class UserDto {
     private String name;
     private String email;
-    List<ChildDto> children;
+    Set<ChildDto> children;
 }
