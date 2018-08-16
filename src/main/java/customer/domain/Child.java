@@ -2,6 +2,7 @@ package customer.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 
 @Data
 @EqualsAndHashCode(exclude = "user")
+@ToString(exclude = "user")
 @Entity
 public class Child {
     @Id
