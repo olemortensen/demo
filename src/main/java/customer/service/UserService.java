@@ -8,8 +8,10 @@ import customer.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -20,18 +22,18 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
+
     public UserDto save(UserDto userDto) {
         User repoUser = new User();
         repoUser.setName(userDto.getName());
         repoUser.setEmail(userDto.getEmail());
-        for (ChildDto childDto : userDto.getChildren()) {
+        Stream.ofNullable(userDto.getChildren()).flatMap(Collection::stream).forEach(childDto -> {
             Child repoChild = new Child();
             repoChild.setAge(childDto.getAge());
             repoChild.setGender(childDto.getGender());
             repoChild.setName(childDto.getName());
             repoUser.addChild(repoChild);
-        }
+        });
         userRepository.save(repoUser);
         return userDto;
     }
