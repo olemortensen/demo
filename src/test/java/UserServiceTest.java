@@ -55,6 +55,28 @@ public class UserServiceTest {
         return user;
     }
 
+    private void verifyUser(User user) {
+        assertEquals(name, user.getName());
+        assertEquals(email, user.getEmail());
+        assertEquals(1, user.getChildren().size());
+        for (Child child : user.getChildren()) {
+            assertEquals(childAge, child.getAge());
+            assertEquals(childGender, child.getGender());
+            assertEquals(childName, child.getName());
+        }
+    }
+
+    private void verifyUser(UserDto user) {
+        assertEquals(name, user.getName());
+        assertEquals(email, user.getEmail());
+        assertEquals(1, user.getChildren().size());
+        for (ChildDto child : user.getChildren()) {
+            assertEquals(childAge, child.getAge());
+            assertEquals(childGender, child.getGender());
+            assertEquals(childName, child.getName());
+        }
+    }
+
     @Test
     public void userSavedWithAllFields() {
 
@@ -63,14 +85,7 @@ public class UserServiceTest {
         userService.save(userDto);
 
         Mockito.verify(repositoryMock).save(userCaptor.capture());
-        assertEquals(name, userCaptor.getValue().getName());
-        assertEquals(email, userCaptor.getValue().getEmail());
-        assertEquals(1, userCaptor.getValue().getChildren().size());
-        userCaptor.getValue().getChildren().forEach(e -> {
-            assertEquals(childAge, e.getAge());
-            assertEquals(childGender, e.getGender());
-            assertEquals(childName, e.getName());
-        });
+        verifyUser(userCaptor.getValue());
     }
 
     @Test
@@ -93,14 +108,6 @@ public class UserServiceTest {
         List<UserDto> userDtoList = userService.getUserDtoList();
 
         assertEquals(1, userDtoList.size());
-        assertEquals(name, userDtoList.get(0).getName());
-        assertEquals(email, userDtoList.get(0).getEmail());
-        assertEquals(1, userDtoList.get(0).getChildren().size());
-        userDtoList.get(0).getChildren().forEach(e -> {
-            assertEquals(childAge, e.getAge());
-            assertEquals(childGender, e.getGender());
-            assertEquals(childName, e.getName());
-        });
-
+        verifyUser(userDtoList.get(0));
     }
 }
