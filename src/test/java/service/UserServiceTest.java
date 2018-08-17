@@ -1,11 +1,13 @@
+package service;
+
 import customer.domain.Child;
 import customer.domain.User;
 import customer.dto.ChildDto;
 import customer.dto.UserDto;
 import customer.repo.UserRepository;
 import customer.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -16,7 +18,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -35,7 +37,7 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    @BeforeEach
+    @Before
     public void setup() {
         userCaptor = ArgumentCaptor.forClass(User.class);
         MockitoAnnotations.initMocks(this);
