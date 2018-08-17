@@ -1,3 +1,4 @@
+import customer.domain.Child;
 import customer.domain.User;
 import customer.dto.ChildDto;
 import customer.dto.UserDto;
@@ -12,10 +13,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
     private final static String email = "emailname@example.com";
@@ -25,20 +27,33 @@ public class UserServiceTest {
     private final static Character childGender = 'f';
 
     @Mock
-    UserRepository repositoryMock;
+    private UserRepository repositoryMock;
 
     @Captor
-    ArgumentCaptor<User> userCaptor;
+    private ArgumentCaptor<User> userCaptor;
 
     @InjectMocks
     private UserService userService;
 
     @BeforeEach
     public void setup() {
+        userCaptor = ArgumentCaptor.forClass(User.class);
         MockitoAnnotations.initMocks(this);
+
         userService = new UserService(repositoryMock);
     }
 
+    private User createUserWithChildren() {
+        Child child = new Child();
+        child.setAge(childAge);
+        child.setGender(childGender);
+        child.setName(childName);
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        user.addChild(child);
+        return user;
+    }
 
     @Test
     public void userSavedWithAllFields() {
@@ -60,13 +75,32 @@ public class UserServiceTest {
 
     @Test
     public void userSavedWithNullChildren() {
-        UserDto userDto = new UserDto(name, email, Set.of(new ChildDto(childName, childGender, childAge)));
+        UserDto userDto = new UserDto(name, email, null);
 
         userService.save(userDto);
 
         Mockito.verify(repositoryMock).save(userCaptor.capture());
         assertEquals(name, userCaptor.getValue().getName());
         assertEquals(email, userCaptor.getValue().getEmail());
-        assertNull(userCaptor.getValue().getChildren());
+        assertEquals(0, userCaptor.getValue().getChildren().size());
+    }
+
+    @Test
+    public void userReadWithChildren() {
+        User user = createUserWithChildren();
+        when(repositoryMock.findAll()).thenReturn(Set.of(user));
+
+        List<UserDto> userDtoList = userService.getUserDtoList();
+
+        assertEquals(1, userDtoList.size());
+        assertEquals(name, userDtoList.get(0).getName());
+        assertEquals(email, userDtoList.get(0).getEmail());
+        assertEquals(1, userDtoList.get(0).getChildren().size());
+        userDtoList.get(0).getChildren().forEach(e -> {
+            assertEquals(childAge, e.getAge());
+            assertEquals(childGender, e.getGender());
+            assertEquals(childName, e.getName());
+        });
+
     }
 }
