@@ -1,5 +1,6 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import customer.Application;
 import customer.controller.MainController;
 import customer.dto.ChildDto;
@@ -8,17 +9,24 @@ import customer.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -32,15 +40,18 @@ public class MainControllerTest {
     private final static Byte childAge = 4;
     private final static Character childGender = 'f';
 
+    @Captor
+    private ArgumentCaptor<UserDto> userCaptor;
+
     @Mock
-    private UserService userService;
+    private UserService userServiceMock;
 
     private MockMvc mockMvc;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        MainController mainController = new MainController(userService);
+        MainController mainController = new MainController(userServiceMock);
         mockMvc = standaloneSetup(mainController).build();
     }
 
@@ -57,14 +68,27 @@ public class MainControllerTest {
     }
 
     @Test
-    public void greetingShouldReturnDefaultMessage1() throws Exception {
-        when(userService.getUserDtoList()).thenReturn(List.of(createUserWithChildren()));
+    public void getUsersShouldReturnAllUsers() throws Exception {
+        when(userServiceMock.getUserDtoList()).thenReturn(List.of(createUserWithChildren()));
 
         String expected = "[{\"name\":\"firstname lastname\",\"email\":\"emailname@example.com\"," +
                 "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}]";
 
         mockMvc.perform(get("/demo/users")).andExpect(status().isOk())
                 .andExpect(content().json(expected));
+    }
+
+    @Test
+    public void postUserShouldSaveUser() throws Exception {
+        String body = "{\"name\":\"firstname lastname\",\"email\":\"emailname@example.com\"," +
+                "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}";
+
+        when(userServiceMock.save(any(UserDto.class))).thenReturn(new UserDto());
+
+        mockMvc.perform(post("/demo/user").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isCreated());
+        verify(userServiceMock).save(userCaptor.capture());
+        ObjectMapper mapper = new ObjectMapper();
+        assertEquals(mapper.writeValueAsString(createUserWithChildren()), body);
     }
 
 }
