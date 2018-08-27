@@ -23,7 +23,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserDto save(UserDto userDto) {
+    private User makeUser(UserDto userDto) {
         User repoUser = new User();
         repoUser.setName(userDto.getName());
         repoUser.setEmail(userDto.getEmail());
@@ -34,7 +34,23 @@ public class UserService {
             repoChild.setName(childDto.getName());
             repoUser.addChild(repoChild);
         });
-        userRepository.save(repoUser);
+        return repoUser;
+    }
+
+    public UserDto save(UserDto userDto) {
+        userRepository.save(makeUser(userDto));
+        return userDto;
+    }
+
+    public UserDto update(UserDto userDto, Long id) {
+        userRepository.findById(id).ifPresentOrElse(u -> {
+                    u.setEmail(userDto.getEmail());
+                    u.setName(userDto.getName());
+                    userRepository.save(u);
+                },
+                () -> {
+                    throw new UserNotFoundException("[" + id + "] not found");
+                });
         return userDto;
     }
 

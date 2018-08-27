@@ -13,6 +13,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +42,8 @@ public class MainControllerTest {
     private final static String childName = "child name";
     private final static Byte childAge = 4;
     private final static Character childGender = 'f';
+    private final static String childJSON = "{\"name\":\"firstname lastname\",\"email\":\"emailname@example.com\"," +
+            "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}";
 
     @Captor
     private ArgumentCaptor<UserDto> userCaptor;
@@ -71,8 +76,7 @@ public class MainControllerTest {
     public void getUsersShouldReturnAllUsers() throws Exception {
         when(userServiceMock.getUserDtoList()).thenReturn(List.of(createUserWithChildren()));
 
-        String expected = "[{\"name\":\"firstname lastname\",\"email\":\"emailname@example.com\"," +
-                "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}]";
+        String expected = "[" + childJSON + "]";
 
         mockMvc.perform(get("/demo/users")).andExpect(status().isOk())
                 .andExpect(content().json(expected));
@@ -80,15 +84,13 @@ public class MainControllerTest {
 
     @Test
     public void postUserShouldSaveUser() throws Exception {
-        String body = "{\"name\":\"firstname lastname\",\"email\":\"emailname@example.com\"," +
-                "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}";
+        String body = childJSON;
 
         when(userServiceMock.save(any(UserDto.class))).thenReturn(new UserDto());
 
         mockMvc.perform(post("/demo/user").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isCreated());
         verify(userServiceMock).save(userCaptor.capture());
-        ObjectMapper mapper = new ObjectMapper();
-        assertEquals(mapper.writeValueAsString(createUserWithChildren()), body);
+        JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
 
 }
