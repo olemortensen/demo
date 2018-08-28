@@ -5,6 +5,7 @@ import customer.domain.User;
 import customer.dto.ChildDto;
 import customer.dto.UserDto;
 import customer.repo.UserRepository;
+import customer.service.UserNotFoundException;
 import customer.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +17,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -80,7 +83,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userSavedWithAllFields() {
+    public void userCanBeSavedWithAllFields() {
 
         UserDto userDto = new UserDto(name, email, Set.of(new ChildDto(childName, childGender, childAge)));
 
@@ -91,7 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userSavedWithNullChildren() {
+    public void userCanBeSavedWithNullChildren() {
         UserDto userDto = new UserDto(name, email, null);
 
         userService.save(userDto);
@@ -103,7 +106,31 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userReadWithChildren() {
+    public void userCanBeUpdated() {
+        Long userId = 42L;
+
+        when(repositoryMock.findById(userId)).thenReturn(Optional.of(createUserWithChildren()));
+
+        UserDto userDto = new UserDto(name, email, null);
+        userService.update(userDto, userId);
+
+        Mockito.verify(repositoryMock).save(userCaptor.capture());
+        assertEquals(name, userCaptor.getValue().getName());
+        assertEquals(email, userCaptor.getValue().getEmail());
+    } 
+
+    @Test(expected = UserNotFoundException.class)
+    public void userNotFoundTrowsException() {
+
+        when(repositoryMock.findById(anyLong())).thenReturn(Optional.empty());
+
+        Long userId = 42L;
+        UserDto userDto = new UserDto(name, email, null);
+        userService.update(userDto, userId);
+    }
+
+    @Test
+    public void allUsersCanBeReadWithChildren() {
         User user = createUserWithChildren();
         when(repositoryMock.findAll()).thenReturn(Set.of(user));
 

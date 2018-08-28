@@ -5,8 +5,10 @@ import customer.Application;
 import customer.controller.MainController;
 import customer.dto.ChildDto;
 import customer.dto.UserDto;
+import customer.service.UserNotFoundException;
 import customer.service.UserService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -23,8 +25,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -100,8 +105,24 @@ public class MainControllerTest {
 
         when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(new UserDto());
 
-        mockMvc.perform(put("/demo/user/42").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
+        mockMvc.perform(put("/demo/user/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
         verify(userServiceMock).update(userCaptor.capture(), eq(userId));
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
+    }
+
+    @Ignore // Ignored because MockMvc does not use exception handler. See https://github.com/spring-projects/spring-boot/issues/7321
+    @Test
+    public void putNonExistingUserShouldReturnError404() throws Exception {
+        String body = childJSON;
+        Long userId = 42L;
+
+        when(userServiceMock.update(any(UserDto.class), anyLong())).thenThrow(new UserNotFoundException("not found"));
+
+        try {
+            mockMvc.perform(put("/demo/user/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isNotFound());
+            fail("exeption expected");
+        } catch (UserNotFoundException e) {
+            verify(userServiceMock, never()).update(userCaptor.capture(), eq(userId));
+        }
     }
 }
