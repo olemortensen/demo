@@ -23,13 +23,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -93,4 +93,15 @@ public class MainControllerTest {
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
 
+    @Test
+    public void putUserShouldUpdateUser() throws Exception {
+        String body = childJSON;
+        Long userId = 42L;
+
+        when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(new UserDto());
+
+        mockMvc.perform(put("/demo/user/42").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
+        verify(userServiceMock).update(userCaptor.capture(), eq(userId));
+        JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
+    }
 }
