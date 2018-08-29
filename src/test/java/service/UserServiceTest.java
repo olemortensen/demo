@@ -84,21 +84,26 @@ public class UserServiceTest {
 
     @Test
     public void userCanBeSavedWithAllFields() {
-
+        // given
         UserDto userDto = new UserDto(name, email, Set.of(new ChildDto(childName, childGender, childAge)));
 
+        // when
         userService.save(userDto);
 
+        // then
         Mockito.verify(repositoryMock).save(userCaptor.capture());
         verifyUser(userCaptor.getValue());
     }
 
     @Test
     public void userCanBeSavedWithNullChildren() {
+        // given
         UserDto userDto = new UserDto(name, email, null);
 
+        // when
         userService.save(userDto);
 
+        // then
         Mockito.verify(repositoryMock).save(userCaptor.capture());
         assertEquals(name, userCaptor.getValue().getName());
         assertEquals(email, userCaptor.getValue().getEmail());
@@ -107,13 +112,15 @@ public class UserServiceTest {
 
     @Test
     public void userCanBeUpdated() {
+        // given
         Long userId = 42L;
-
         when(repositoryMock.findById(userId)).thenReturn(Optional.of(createUserWithChildren()));
-
         UserDto userDto = new UserDto(name, email, null);
+
+        // when
         userService.update(userDto, userId);
 
+        // then
         Mockito.verify(repositoryMock).save(userCaptor.capture());
         assertEquals(name, userCaptor.getValue().getName());
         assertEquals(email, userCaptor.getValue().getEmail());
@@ -121,21 +128,25 @@ public class UserServiceTest {
 
     @Test(expected = UserNotFoundException.class)
     public void userNotFoundTrowsException() {
-
+        // given
         when(repositoryMock.findById(anyLong())).thenReturn(Optional.empty());
-
         Long userId = 42L;
         UserDto userDto = new UserDto(name, email, null);
+
+        // when
         userService.update(userDto, userId);
     }
 
     @Test
     public void allUsersCanBeReadWithChildren() {
+        // given
         User user = createUserWithChildren();
         when(repositoryMock.findAll()).thenReturn(Set.of(user));
 
+        // when
         List<UserDto> userDtoList = userService.getUserDtoList();
 
+        // then
         assertEquals(1, userDtoList.size());
         verifyUser(userDtoList.get(0));
     }
