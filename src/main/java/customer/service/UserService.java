@@ -4,7 +4,7 @@ import customer.domain.Child;
 import customer.domain.User;
 import customer.dto.ChildDto;
 import customer.dto.UserDto;
-import customer.repo.UserRepository;
+import customer.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package customer.repo;
+package customer.repository;
 
 import customer.domain.User;
 import org.springframework.data.repository.CrudRepository;

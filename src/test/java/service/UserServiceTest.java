@@ -4,7 +4,7 @@ import customer.domain.Child;
 import customer.domain.User;
 import customer.dto.ChildDto;
 import customer.dto.UserDto;
-import customer.repo.UserRepository;
+import customer.repository.UserRepository;
 import customer.service.UserNotFoundException;
 import customer.service.UserService;
 import org.junit.Before;
