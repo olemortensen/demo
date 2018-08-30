@@ -19,6 +19,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -41,6 +42,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class})
+@ContextConfiguration
 public class MainControllerTest {
     private final static String email = "emailname@example.com";
     private final static String name = "firstname lastname";
@@ -98,19 +100,8 @@ public class MainControllerTest {
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
 
-    @Test
-    public void putUserShouldUpdateUser() throws Exception {
-        String body = childJSON;
-        Long userId = 42L;
-
-        when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(new UserDto());
-
-        mockMvc.perform(put("/demo/user/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
-        verify(userServiceMock).update(userCaptor.capture(), eq(userId));
-        JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
-    }
-
-    @Ignore // Ignored because MockMvc does not use exception handler. See https://github.com/spring-projects/spring-boot/issues/7321
+    // Ignored because MockMvc does not use exception handler. See https://github.com/spring-projects/spring-boot/issues/7321
+    @Ignore
     @Test
     public void putNonExistingUserShouldReturnError404() throws Exception {
         String body = childJSON;
@@ -124,5 +115,17 @@ public class MainControllerTest {
         } catch (UserNotFoundException e) {
             verify(userServiceMock, never()).update(userCaptor.capture(), eq(userId));
         }
+    }
+
+    @Test
+    public void putUserShouldUpdateUser() throws Exception {
+        String body = childJSON;
+        Long userId = 42L;
+
+        when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(new UserDto());
+
+        mockMvc.perform(put("/demo/user/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
+        verify(userServiceMock).update(userCaptor.capture(), eq(userId));
+        JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
 }
