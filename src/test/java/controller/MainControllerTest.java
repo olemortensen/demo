@@ -50,7 +50,7 @@ public class MainControllerTest {
     private final static Byte childAge = 4;
     private final static Character childGender = 'f';
     private final static String childJSON = "{\"name\":\"firstname lastname\",\"email\":\"emailname@example.com\"," +
-            "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}";
+        "\"children\":[{\"name\":\"child name\",\"gender\":\"f\",\"age\":4}]}";
 
     @Captor
     private ArgumentCaptor<UserDto> userCaptor;
@@ -86,7 +86,7 @@ public class MainControllerTest {
         String expected = "[" + childJSON + "]";
 
         mockMvc.perform(get("/demo/users")).andExpect(status().isOk())
-                .andExpect(content().json(expected));
+            .andExpect(content().json(expected));
     }
 
     @Test
