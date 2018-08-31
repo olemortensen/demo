@@ -124,7 +124,7 @@ public class UserServiceTest {
         Mockito.verify(repositoryMock).save(userCaptor.capture());
         assertEquals(name, userCaptor.getValue().getName());
         assertEquals(email, userCaptor.getValue().getEmail());
-    } 
+    }
 
     @Test(expected = UserNotFoundException.class)
     public void userNotFoundTrowsException() {
