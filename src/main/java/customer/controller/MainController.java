@@ -5,7 +5,6 @@ import customer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/demo")
 public class MainController {
     private final UserService userService;
@@ -28,24 +28,21 @@ public class MainController {
     }
 
 
-    @PostMapping(value = "/user", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/users", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public @ResponseBody
-    UserDto createUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@RequestBody UserDto userDto) {
         return userService.save(userDto);
     }
 
-    @PutMapping(value = "/user/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PutMapping(value = "/users/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK)
-    public @ResponseBody
-    UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("id") Long id) {
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("id") Long id) {
         return userService.update(userDto, id);
     }
 
 
     @GetMapping("/users")
-    public @ResponseBody
-    List<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return userService.getUserDtoList();
     }
 }

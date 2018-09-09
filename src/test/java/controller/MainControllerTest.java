@@ -95,7 +95,7 @@ public class MainControllerTest {
 
         when(userServiceMock.save(any(UserDto.class))).thenReturn(new UserDto());
 
-        mockMvc.perform(post("/demo/user").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isCreated());
+        mockMvc.perform(post("/demo/users").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isCreated());
         verify(userServiceMock).save(userCaptor.capture());
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
@@ -110,7 +110,7 @@ public class MainControllerTest {
         when(userServiceMock.update(any(UserDto.class), anyLong())).thenThrow(new UserNotFoundException("not found"));
 
         try {
-            mockMvc.perform(put("/demo/user/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isNotFound());
+            mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isNotFound());
             fail("exeption expected");
         } catch (UserNotFoundException e) {
             verify(userServiceMock, never()).update(userCaptor.capture(), eq(userId));
@@ -124,7 +124,7 @@ public class MainControllerTest {
 
         when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(new UserDto());
 
-        mockMvc.perform(put("/demo/user/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
+        mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
         verify(userServiceMock).update(userCaptor.capture(), eq(userId));
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
