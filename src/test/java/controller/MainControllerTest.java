@@ -30,12 +30,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -85,7 +81,8 @@ public class MainControllerTest {
 
         String expected = "[" + childJSON + "]";
 
-        mockMvc.perform(get("/demo/users")).andExpect(status().isOk())
+        mockMvc.perform(get("/demo/users"))
+            .andExpect(status().isOk())
             .andExpect(content().json(expected));
     }
 
@@ -95,7 +92,9 @@ public class MainControllerTest {
 
         when(userServiceMock.save(any(UserDto.class))).thenReturn(new UserDto());
 
-        mockMvc.perform(post("/demo/users").contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isCreated());
+        mockMvc.perform(post("/demo/users").contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
+            .andExpect(status().isCreated());
+
         verify(userServiceMock).save(userCaptor.capture());
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
@@ -110,8 +109,9 @@ public class MainControllerTest {
         when(userServiceMock.update(any(UserDto.class), anyLong())).thenThrow(new UserNotFoundException("not found"));
 
         try {
-            mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isNotFound());
-            fail("exeption expected");
+            mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
+                .andExpect(status().isNotFound());
+            fail("exception expected");
         } catch (UserNotFoundException e) {
             verify(userServiceMock, never()).update(userCaptor.capture(), eq(userId));
         }
@@ -124,7 +124,8 @@ public class MainControllerTest {
 
         when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(new UserDto());
 
-        mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body)).andExpect(status().isOk());
+        mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
+            .andExpect(status().isOk());
         verify(userServiceMock).update(userCaptor.capture(), eq(userId));
         JSONAssert.assertEquals(new ObjectMapper().writeValueAsString(createUserWithChildren()), body, JSONCompareMode.STRICT);
     }
