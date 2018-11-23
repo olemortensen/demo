@@ -28,8 +28,8 @@ public class UserServiceTest {
     private final static String email = "emailname@example.com";
     private final static String name = "firstname lastname";
     private final static String childName = "child name";
-    private final static Byte childAge = 4;
-    private final static Character childGender = 'f';
+    private final static Integer childAge = 4;
+    private final static String childGender = "f";
 
     @Mock
     private UserRepository repositoryMock;
@@ -85,7 +85,17 @@ public class UserServiceTest {
     @Test
     public void userCanBeSavedWithAllFields() {
         // given
-        UserDto userDto = new UserDto(name, email, Set.of(new ChildDto(childName, childGender, childAge)));
+        UserDto userDto = UserDto.builder()
+            .name(name)
+            .email(email)
+            .build();
+
+        userDto.setChildren(Set.of(ChildDto.builder()
+            .name(childName)
+            .age(childAge)
+            .gender(childGender)
+            .build()
+        ));
 
         // when
         userService.save(userDto);
@@ -98,7 +108,7 @@ public class UserServiceTest {
     @Test
     public void userCanBeSavedWithNullChildren() {
         // given
-        UserDto userDto = new UserDto(name, email, null);
+        UserDto userDto = UserDto.builder().name(name).email(email).build();
 
         // when
         userService.save(userDto);
@@ -115,7 +125,7 @@ public class UserServiceTest {
         // given
         Long userId = 42L;
         when(repositoryMock.findById(userId)).thenReturn(Optional.of(createUserWithChildren()));
-        UserDto userDto = new UserDto(name, email, null);
+        UserDto userDto = UserDto.builder().name(name).email(email).build();
 
         // when
         userService.update(userDto, userId);
@@ -131,7 +141,7 @@ public class UserServiceTest {
         // given
         when(repositoryMock.findById(anyLong())).thenReturn(Optional.empty());
         Long userId = 42L;
-        UserDto userDto = new UserDto(name, email, null);
+        UserDto userDto = UserDto.builder().name(name).email(email).build();
 
         // when
         userService.update(userDto, userId);
