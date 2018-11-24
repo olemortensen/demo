@@ -14,7 +14,7 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public final ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

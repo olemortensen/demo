@@ -9,12 +9,14 @@ import customer.service.UserNotFoundException;
 import customer.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +47,7 @@ public class UserServiceTest {
         userCaptor = ArgumentCaptor.forClass(User.class);
         MockitoAnnotations.initMocks(this);
 
-        userService = new UserService(repositoryMock);
+//        userService = new UserService(repositoryMock);
     }
 
     private User createUserWithChildren() {

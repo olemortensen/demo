@@ -54,7 +54,7 @@ public class MainControllerTest {
     private ArgumentCaptor<UserDto> userCaptor;
 
     @Mock
-    private UserService userServiceMock;
+    private UserService userService;
 
     private ObjectMapper mapper;
 
@@ -62,10 +62,10 @@ public class MainControllerTest {
 
     @Before
     public void setup() {
-        mapper = new ObjectMapper();
         MockitoAnnotations.initMocks(this);
-        MainController mainController = new MainController(userServiceMock);
+        MainController mainController = new MainController(userService);
         mockMvc = standaloneSetup(mainController).setControllerAdvice(UserExceptionHandler.class).build();
+        mapper = new ObjectMapper();
     }
 
 
@@ -83,7 +83,7 @@ public class MainControllerTest {
             .build()
         ));
 
-        when(userServiceMock.getUserDtoList()).thenReturn(List.of(userDto));
+        when(userService.getUserDtoList()).thenReturn(List.of(userDto));
 
 
         mockMvc.perform(get("/demo/users"))
@@ -112,7 +112,7 @@ public class MainControllerTest {
             .gender(childGender)
             .build()
         ));
-        when(userServiceMock.save(any(UserDto.class))).thenReturn(userDto);
+        when(userService.save(any(UserDto.class))).thenReturn(userDto);
 
         String body = mapper.writeValueAsString(userDto);
         mockMvc.perform(post("/demo/users")
@@ -126,7 +126,7 @@ public class MainControllerTest {
             .andExpect(jsonPath("$.children[0].gender", is(childGender)))
             .andExpect(jsonPath("$.children[0].age", is((childAge))));
 
-        verify(userServiceMock).save(userCaptor.capture());
+        verify(userService).save(userCaptor.capture());
         JSONAssert.assertEquals(mapper.writeValueAsString(userDto), body, JSONCompareMode.STRICT);
     }
 
@@ -134,7 +134,7 @@ public class MainControllerTest {
     public void putNonExistingUserShouldReturnError404() throws Exception {
         long userId = 42L;
 
-        when(userServiceMock.update(any(UserDto.class), anyLong())).thenThrow(new UserNotFoundException("not found"));
+        when(userService.update(any(UserDto.class), anyLong())).thenThrow(new UserNotFoundException("not found"));
 
         UserDto userDto = UserDto.builder()
             .name(name)
@@ -169,13 +169,13 @@ public class MainControllerTest {
             .build()
         ));
 
-        when(userServiceMock.update(any(UserDto.class), eq(userId))).thenReturn(userDto);
+        when(userService.update(any(UserDto.class), eq(userId))).thenReturn(userDto);
 
         String body = mapper.writeValueAsString(userDto);
 
         mockMvc.perform(put("/demo/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
             .andExpect(status().isOk());
-        verify(userServiceMock).update(userCaptor.capture(), eq(userId));
+        verify(userService).update(userCaptor.capture(), eq(userId));
         JSONAssert.assertEquals(mapper.writeValueAsString(userDto), body, JSONCompareMode.STRICT);
     }
 }
